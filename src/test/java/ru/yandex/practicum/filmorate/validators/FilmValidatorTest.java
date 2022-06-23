@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.validators;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
 
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import java.time.LocalDate;
 
 public class FilmValidatorTest {
     public static final int MAX_DESCRIPTION_LENGTH = 200;
