@@ -66,7 +66,7 @@ public abstract class DataController<T extends DataStorage> {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> validationHandler(MethodArgumentNotValidException ex) {
+    public Map<String, String> validationExceptionHandler(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new LinkedHashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
