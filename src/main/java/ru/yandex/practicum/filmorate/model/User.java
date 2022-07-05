@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
@@ -8,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Data
-public class User extends DataStorage{
+public class User extends DataStorage {
     @NotBlank(message = "E-mail не может быть пустым")
     @Email(message = "Неверный формат E-mail")
     private String email;
