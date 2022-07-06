@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.validators;
 
 import ru.yandex.practicum.filmorate.model.User;
 
-/*
-Ручная валидация данных о пользователе
+/**
+ * Ручная валидация данных о пользователе
  */
 public class UserValidator {
     public static void validate(User user) {
