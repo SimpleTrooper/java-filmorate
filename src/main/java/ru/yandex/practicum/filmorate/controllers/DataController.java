@@ -40,14 +40,14 @@ public abstract class DataController<T extends DataEntity> {
      */
     @PostMapping
     public  T add(@Valid @RequestBody T dataEntity) {
-        log.info("Попытка добавить новую запись");
+        log.info("Попытка добавить новую запись, класс = {}", dataEntity.getClass().getSimpleName());
         try {
             validate(dataEntity);
         } catch (ValidationException ex) {
             throw new ValidationException(ex.getMessage(), ex);
         }
         T returnedEntity = dataService.create(dataEntity);
-        log.info("Добавлена новая запись с id = {}", returnedEntity.getId());
+        log.info("Добавлена новая запись с id = {}: {}", returnedEntity.getId(), returnedEntity);
         return returnedEntity;
     }
 
@@ -57,8 +57,8 @@ public abstract class DataController<T extends DataEntity> {
      */
     @PutMapping
     public T update(@Valid @RequestBody T dataEntity) {
-        int id = dataEntity.getId();
-        log.info("Попытка обновить запись с id={}", id);
+        long id = dataEntity.getId();
+        log.info("Попытка обновить запись с id={}, класс = {}", id, dataEntity.getClass().getSimpleName());
         try {
             validate(dataEntity);
         } catch (ValidationException ex) {
@@ -74,10 +74,10 @@ public abstract class DataController<T extends DataEntity> {
      * @return T extends DataEntity - найденный объект
      */
     @GetMapping("/{id}")
-    public T find(@PathVariable Integer id) {
+    public T find(@PathVariable Long id) {
         log.info("Попытка получить запись с id={}", id);
         T data = dataService.getById(id);
-        log.info("Запись с id={} получена", id);
+        log.info("Запись с id={} получена: {}", id, data);
         return data;
     }
 }

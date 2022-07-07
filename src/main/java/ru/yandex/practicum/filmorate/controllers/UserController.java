@@ -36,10 +36,10 @@ public class UserController extends DataController<User> {
      * @param friendId - ID друга
      */
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable(name = "id") Integer userId, @PathVariable Integer friendId) {
+    public void addFriend(@PathVariable(name = "id") Long userId, @PathVariable Long friendId) {
         log.info("Попытка добавить в друзья пользователей с id = {}, {}", userId, friendId);
         userService.addFriend(userId, friendId);
-        log.info("Успешно");
+        log.info("Добавлены в друзья пользователи с id = {}, {}", userId, friendId);
     }
 
     /**
@@ -48,10 +48,10 @@ public class UserController extends DataController<User> {
      * @param friendId - ID друга
      */
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFriend(@PathVariable(name = "id") Integer userId, @PathVariable Integer friendId) {
+    public void removeFriend(@PathVariable(name = "id") Long userId, @PathVariable Long friendId) {
         log.info("Попытка удалить из друзей пользователей с id = {}, {}", userId, friendId);
         userService.removeFriend(userId, friendId);
-        log.info("Успешно");
+        log.info("Удалены из друзей пользователи с id = {}, {}", userId, friendId);
     }
 
     /**
@@ -59,10 +59,10 @@ public class UserController extends DataController<User> {
      * @param userId - ID пользователя
      */
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable(name = "id") Integer userId) {
+    public List<User> getFriends(@PathVariable(name = "id") Long userId) {
         log.info("Попытка вернуть список друзей пользователя с id = {}", userId);
         List<User> friends = userService.findFriends(userId);
-        log.info("Успешно");
+        log.info("Получен список друзей пользователя с id = {}", userId);
         return friends;
     }
 
@@ -72,10 +72,10 @@ public class UserController extends DataController<User> {
      * @param otherId - ID второго пользователя
      */
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable(name = "id") Integer userId, @PathVariable Integer otherId) {
+    public List<User> getMutualFriends(@PathVariable(name = "id") Long userId, @PathVariable Long otherId) {
         log.info("Попытка вернуть список общих друзей пользователей с id = {}, {}", userId, otherId);
         List<User> mutualFriends = userService.findMutualFriends(userId, otherId);
-        log.info("Успешно");
+        log.info("Получен список общих друзей пользователей с id = {}, {}", userId, otherId);
         return mutualFriends;
     }
 }

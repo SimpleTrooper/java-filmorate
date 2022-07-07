@@ -37,10 +37,10 @@ public class FilmController extends DataController<Film>{
      * @param userId - ID пользователя
      */
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable(name = "id") Integer filmId, @PathVariable Integer userId) {
+    public void addLike(@PathVariable(name = "id") Long filmId, @PathVariable Long userId) {
         log.info("Попытка поставить лайк фильму с id = {} пользователем c id = {}", filmId, userId);
         filmService.addLike(filmId, userId);
-        log.info("Успешно");
+        log.info("Добавлен лайк фильму с id = {} пользователем с id = {}", filmId, userId);
     }
 
     /**
@@ -49,10 +49,10 @@ public class FilmController extends DataController<Film>{
      * @param userId - ID пользователя
      */
     @DeleteMapping("/{id}/like/{userId}")
-    public void removeLike(@PathVariable(name = "id") Integer filmId, @PathVariable Integer userId) {
+    public void removeLike(@PathVariable(name = "id") Long filmId, @PathVariable Long userId) {
         log.info("Попытка удалить лайк фильму с id = {} пользователем c id = {}", filmId, userId);
         filmService.removeLike(filmId, userId);
-        log.info("Успешно");
+        log.info("Удален лайк фильму с id = {} пользователем с id = {}", filmId, userId);
     }
 
     /**
@@ -63,7 +63,7 @@ public class FilmController extends DataController<Film>{
     public List<Film> getTopN(@RequestParam(defaultValue = "10") Integer count) {
         log.info("Попытка получить {} фильмов с наибольшим числом лайков", count);
         List<Film> topFilms = filmService.getTopN(count);
-        log.info("Успешно");
+        log.info("Получены {} фильмов с наибольшим числом лайков", count);
         return topFilms;
     }
 }
