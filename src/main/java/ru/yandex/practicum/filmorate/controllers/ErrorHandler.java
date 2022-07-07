@@ -2,13 +2,12 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 /**
  * Обработчик ошибок
@@ -18,34 +17,34 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 public class ErrorHandler {
     /**
      * Обработчик исключения при отсутствии ресурса
-     * @return Объект ErrorResponse - ошибка, описание ошибки. код 404
+     * @return  описание ошибки. код 404
      */
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundHandler(NotFoundException ex) {
-        log.error("Ресурс не найден: {}", ex.getMessage());
-        return new ErrorResponse("Ресурс не найден.", ex.getMessage());
+    public ResponseEntity<String> notFoundHandler(NotFoundException ex) {
+        String errorMessage = String.format("Ресурс не найден: %s", ex.getMessage());
+        log.error(errorMessage);
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 
     /**
      * Обработчик исключения при неверной валидации
-     * @return Объект ErrorResponse - ошибка, описание ошибки. код 400
+     * @return   описание ошибки. код 400
      */
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationHandler(ValidationException ex) {
-        log.error("Ошибка валидации: {}", ex.getMessage());
-        return new ErrorResponse("Ошибка валидации.", ex.getMessage());
+    public ResponseEntity<String> validationHandler(ValidationException ex) {
+        String errorMessage = String.format("Ошибка валидации: %s", ex.getMessage());
+        log.error(errorMessage);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Обработчик остальных Runtime исключений
-     * @return Объект ErrorResponse - ошибка, описание ошибки. код 500
+     * @return   описание ошибки. код 500
      */
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse runtimeHandler(RuntimeException ex) {
-        log.error("Непредвиденная ошибка: {}", ex.getMessage());
-        return new ErrorResponse("Непредвиденная ошибка.", ex.getMessage());
+    public ResponseEntity<String> runtimeHandler(RuntimeException ex) {
+        String errorMessage = String.format("Непредвиденная ошибка: %s", ex.getMessage());
+        log.error(errorMessage);
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
