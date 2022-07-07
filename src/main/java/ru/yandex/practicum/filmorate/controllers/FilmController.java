@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/films")
-public class FilmController extends DataController<Film>{
+public class FilmController extends DataController<Film> {
     private final FilmService filmService;
 
     @Autowired
@@ -33,6 +33,7 @@ public class FilmController extends DataController<Film>{
 
     /**
      * Обработчик эндпоинта добавления лайка фильму
+     *
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
@@ -45,6 +46,7 @@ public class FilmController extends DataController<Film>{
 
     /**
      * Обработчик эндпоинта удаления лайка фильму
+     *
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
@@ -57,6 +59,7 @@ public class FilmController extends DataController<Film>{
 
     /**
      * Обработчик эндпоинта вывода фильмов с наибольшим числом лайков
+     *
      * @param count - количество фильмов с наибольшим числом лайков
      */
     @GetMapping("/popular")

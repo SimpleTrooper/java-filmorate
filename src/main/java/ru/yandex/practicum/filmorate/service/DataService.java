@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Класс логики обработки абстрактных записей
+ *
  * @param <T> Интерфейс - абстрактное хранилище записей
  * @param <V> Тип записи
  */
@@ -20,6 +21,7 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
 
     /**
      * Создание новой записи в хранилище
+     *
      * @param dataEntity - новая запись
      * @return новая запись с обновленным ID
      */
@@ -29,6 +31,7 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
 
     /**
      * Обновление новой записи в хранилище
+     *
      * @param dataEntity - новая запись с верным ID
      * @return новая запись
      */
@@ -42,6 +45,7 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
 
     /**
      * Получение всех записей из хранилища
+     *
      * @return список всех записей
      */
     public List<V> findAll() {
@@ -50,6 +54,7 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
 
     /**
      * Получение всех записи из хранилища по ID
+     *
      * @return нужная запись из хранилища
      */
     public V getById(Long id) {

@@ -10,6 +10,7 @@ public class IdGen {
     @Getter
     @Setter
     private long id = 0;
+
     public long nextId() {
         return ++id;
     }

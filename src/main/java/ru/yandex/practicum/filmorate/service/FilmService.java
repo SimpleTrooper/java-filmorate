@@ -28,6 +28,7 @@ public class FilmService extends DataService<FilmStorage, Film> {
 
     /**
      * Добавление лайка фильму
+     *
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
@@ -47,6 +48,7 @@ public class FilmService extends DataService<FilmStorage, Film> {
 
     /**
      * Удаление лайка фильму
+     *
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
@@ -66,6 +68,7 @@ public class FilmService extends DataService<FilmStorage, Film> {
 
     /**
      * Возвращение n фильмов с наибольшим числом лайков
+     *
      * @param n - количество фильмов с наибольшим числом лайков
      */
     public List<Film> getTopN(int n) {

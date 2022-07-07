@@ -32,7 +32,8 @@ public class UserController extends DataController<User> {
 
     /**
      * Обработчик эндпоинта добавления пользователей в друзья
-     * @param userId - ID пользователя
+     *
+     * @param userId   - ID пользователя
      * @param friendId - ID друга
      */
     @PutMapping("/{id}/friends/{friendId}")
@@ -44,7 +45,8 @@ public class UserController extends DataController<User> {
 
     /**
      * Обработчик эндпоинта удаления пользователей из друзей
-     * @param userId - ID пользователя
+     *
+     * @param userId   - ID пользователя
      * @param friendId - ID друга
      */
     @DeleteMapping("/{id}/friends/{friendId}")
@@ -56,6 +58,7 @@ public class UserController extends DataController<User> {
 
     /**
      * Обработчик эндпоинта получения всех друзей пользователя
+     *
      * @param userId - ID пользователя
      */
     @GetMapping("/{id}/friends")
@@ -68,7 +71,8 @@ public class UserController extends DataController<User> {
 
     /**
      * Обработчик эндпоинта получения общих друзей пользователей
-     * @param userId - ID пользователя
+     *
+     * @param userId  - ID пользователя
      * @param otherId - ID второго пользователя
      */
     @GetMapping("/{id}/friends/common/{otherId}")

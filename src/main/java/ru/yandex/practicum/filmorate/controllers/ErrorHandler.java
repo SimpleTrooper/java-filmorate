@@ -17,7 +17,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 public class ErrorHandler {
     /**
      * Обработчик исключения при отсутствии ресурса
-     * @return  описание ошибки. код 404
+     *
+     * @return описание ошибки. код 404
      */
     @ExceptionHandler
     public ResponseEntity<String> notFoundHandler(NotFoundException ex) {
@@ -28,7 +29,8 @@ public class ErrorHandler {
 
     /**
      * Обработчик исключения при неверной валидации
-     * @return   описание ошибки. код 400
+     *
+     * @return описание ошибки. код 400
      */
     @ExceptionHandler
     public ResponseEntity<String> validationHandler(ValidationException ex) {
@@ -39,7 +41,8 @@ public class ErrorHandler {
 
     /**
      * Обработчик остальных Runtime исключений
-     * @return   описание ошибки. код 500
+     *
+     * @return описание ошибки. код 500
      */
     @ExceptionHandler
     public ResponseEntity<String> runtimeHandler(RuntimeException ex) {

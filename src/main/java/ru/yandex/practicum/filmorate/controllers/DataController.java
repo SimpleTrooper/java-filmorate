@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+
 import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -27,6 +29,7 @@ public abstract class DataController<T extends DataEntity> {
 
     /**
      * Обработчик эндпоинта, возвращающий все записи
+     *
      * @return List<T extends DataEntity>.
      */
     @GetMapping
@@ -36,10 +39,11 @@ public abstract class DataController<T extends DataEntity> {
 
     /**
      * Обработчик эндпоинта, добавляющий новую запись
+     *
      * @return T extends DataEntity - добавленный объект с новым ID
      */
     @PostMapping
-    public  T add(@Valid @RequestBody T dataEntity) {
+    public T add(@Valid @RequestBody T dataEntity) {
         log.info("Попытка добавить новую запись, класс = {}", dataEntity.getClass().getSimpleName());
         try {
             validate(dataEntity);
@@ -53,6 +57,7 @@ public abstract class DataController<T extends DataEntity> {
 
     /**
      * Обработчик эндпоинта, обновляющий запись
+     *
      * @return T extends DataEntity - обновленный объект
      */
     @PutMapping
@@ -65,12 +70,13 @@ public abstract class DataController<T extends DataEntity> {
             throw new ValidationException(ex.getMessage(), ex);
         }
         dataService.update(dataEntity);
-        log.info("Обновлена запись c id={}: {}",id, dataEntity);
+        log.info("Обновлена запись c id={}: {}", id, dataEntity);
         return dataEntity;
     }
 
     /**
      * Обработчик эндпоинта, получающий запись по ID
+     *
      * @return T extends DataEntity - найденный объект
      */
     @GetMapping("/{id}")

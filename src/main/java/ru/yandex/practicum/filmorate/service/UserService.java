@@ -25,7 +25,8 @@ public class UserService extends DataService<UserStorage, User> {
 
     /**
      * Добавление пользователей в друзья
-     * @param userId - ID пользователя
+     *
+     * @param userId   - ID пользователя
      * @param friendId - ID друга
      */
     public void addFriend(Long userId, Long friendId) {
@@ -45,7 +46,8 @@ public class UserService extends DataService<UserStorage, User> {
 
     /**
      * Удаление пользователей из друзей
-     * @param userId - ID пользователя
+     *
+     * @param userId   - ID пользователя
      * @param friendId - ID друга
      */
     public void removeFriend(Long userId, Long friendId) {
@@ -65,6 +67,7 @@ public class UserService extends DataService<UserStorage, User> {
 
     /**
      * Получение друзей пользователя
+     *
      * @param userId - ID пользователя
      * @return список друзей пользователя
      */
@@ -81,7 +84,8 @@ public class UserService extends DataService<UserStorage, User> {
 
     /**
      * Получение общих друзей пользователей
-     * @param firstUserId - ID первого пользователя
+     *
+     * @param firstUserId  - ID первого пользователя
      * @param secondUserId - ID второго пользователя
      * @return список общих друзей пользователей
      */
