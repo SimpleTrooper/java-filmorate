@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-/*
-Ручная валидация данных о фильме
+/**
+ * Ручная валидация данных о фильме
  */
 public class FilmValidator {
     public static void validate(Film film) {

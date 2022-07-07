@@ -1,79 +1,89 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+
 import javax.validation.Valid;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.DataStorage;
-import ru.yandex.practicum.filmorate.util.IdGen;
+import ru.yandex.practicum.filmorate.model.DataEntity;
+import ru.yandex.practicum.filmorate.service.DataService;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
+import java.util.List;
+
+/**
+ * Абстрактный контроллер с общими методами
+ */
 @Slf4j
 @RestController
-public abstract class DataController<T extends DataStorage> {
-    private final IdGen idGen = new IdGen();
-    private final Map<Integer, T> data = new LinkedHashMap<>();
+public abstract class DataController<T extends DataEntity> {
+    private final DataService<? extends Storage<T>, T> dataService;
 
-    protected abstract void validate(T dataStorage);
+    public DataController(DataService<? extends Storage<T>, T> dataService) {
+        this.dataService = dataService;
+    }
 
+    protected abstract void validate(T dataEntity);
+
+    /**
+     * Обработчик эндпоинта, возвращающий все записи
+     *
+     * @return List<T extends DataEntity>.
+     */
     @GetMapping
-    public List<DataStorage> getAll() {
-        return new ArrayList<>(data.values());
+    public List<T> findAll() {
+        return dataService.findAll();
     }
 
+    /**
+     * Обработчик эндпоинта, добавляющий новую запись
+     *
+     * @return T extends DataEntity - добавленный объект с новым ID
+     */
     @PostMapping
-    public DataStorage add(@Valid @RequestBody T dataStorage) {
+    public T add(@Valid @RequestBody T dataEntity) {
+        log.info("Попытка добавить новую запись, класс = {}", dataEntity.getClass().getSimpleName());
         try {
-            validate(dataStorage);
+            validate(dataEntity);
         } catch (ValidationException ex) {
-            log.error("Попытка добавить запись. " + ex.getMessage());
             throw new ValidationException(ex.getMessage(), ex);
         }
-        int nextFilmId = idGen.nextId();
-        dataStorage.setId(nextFilmId);
-        data.put(nextFilmId, dataStorage);
-        log.info("Добавлена новая запись: {}", dataStorage);
-        return dataStorage;
+        T returnedEntity = dataService.create(dataEntity);
+        log.info("Добавлена новая запись с id = {}: {}", returnedEntity.getId(), returnedEntity);
+        return returnedEntity;
     }
 
+    /**
+     * Обработчик эндпоинта, обновляющий запись
+     *
+     * @return T extends DataEntity - обновленный объект
+     */
     @PutMapping
-    public DataStorage update(@Valid @RequestBody T dataStorage) {
-        int id = dataStorage.getId();
-        if (!data.containsKey(id)) {
-            log.error("Попытка обновить запись с несуществующим id={}", id);
-            throw new NotFoundException("Запись с id = " + id + " не найдена");
-        }
+    public T update(@Valid @RequestBody T dataEntity) {
+        long id = dataEntity.getId();
+        log.info("Попытка обновить запись с id={}, класс = {}", id, dataEntity.getClass().getSimpleName());
         try {
-            validate(dataStorage);
+            validate(dataEntity);
         } catch (ValidationException ex) {
-            log.error("Попытка обновить запись с id={}. " + ex.getMessage(), id);
             throw new ValidationException(ex.getMessage(), ex);
         }
-        dataStorage.setId(id);
-        data.put(id, dataStorage);
-        log.info("Обновлена запись c id={}: {}",id, dataStorage);
-        return dataStorage;
+        dataService.update(dataEntity);
+        log.info("Обновлена запись c id={}: {}", id, dataEntity);
+        return dataEntity;
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> validationExceptionHandler(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new LinkedHashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-            log.error("Попытка обновить/добавить запись. Ошибка валидации - " + fieldName + ": " + errorMessage);
-        });
-        return errors;
+    /**
+     * Обработчик эндпоинта, получающий запись по ID
+     *
+     * @return T extends DataEntity - найденный объект
+     */
+    @GetMapping("/{id}")
+    public T find(@PathVariable Long id) {
+        log.info("Попытка получить запись с id={}", id);
+        T data = dataService.getById(id);
+        log.info("Запись с id={} получена: {}", id, data);
+        return data;
     }
 }
