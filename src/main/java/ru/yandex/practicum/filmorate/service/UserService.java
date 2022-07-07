@@ -28,7 +28,7 @@ public class UserService extends DataService<UserStorage, User> {
      * @param userId - ID пользователя
      * @param friendId - ID друга
      */
-    public void addFriend(Integer userId, Integer friendId) {
+    public void addFriend(Long userId, Long friendId) {
         User user = storage.findById(userId);
         if (user == null) {
             throw new NotFoundException(String.format("Попытка добавить пользователю с id=%d, друга с id=%d. " +
@@ -48,7 +48,7 @@ public class UserService extends DataService<UserStorage, User> {
      * @param userId - ID пользователя
      * @param friendId - ID друга
      */
-    public void removeFriend(Integer userId, Integer friendId) {
+    public void removeFriend(Long userId, Long friendId) {
         User user = storage.findById(userId);
         if (user == null) {
             throw new NotFoundException(String.format("Попытка удалить у пользователя с id=%d, друга с id=%d. " +
@@ -68,7 +68,7 @@ public class UserService extends DataService<UserStorage, User> {
      * @param userId - ID пользователя
      * @return список друзей пользователя
      */
-    public List<User> findFriends(Integer userId) {
+    public List<User> findFriends(Long userId) {
         User user = storage.findById(userId);
         if (user == null) {
             throw new NotFoundException(String.format("Попытка получить список друзей пользователя с " +
@@ -85,7 +85,7 @@ public class UserService extends DataService<UserStorage, User> {
      * @param secondUserId - ID второго пользователя
      * @return список общих друзей пользователей
      */
-    public List<User> findMutualFriends(Integer firstUserId, Integer secondUserId) {
+    public List<User> findMutualFriends(Long firstUserId, Long secondUserId) {
         User firstUser = storage.findById(firstUserId);
         if (firstUser == null) {
             throw new NotFoundException(String.format("Попытка получить список общих друзей пользователей с " +
@@ -96,7 +96,7 @@ public class UserService extends DataService<UserStorage, User> {
             throw new NotFoundException(String.format("Попытка получить список общих друзей пользователей с " +
                     "id=%d, %d. Пользователь с id=%d не найден", firstUserId, secondUserId, secondUserId));
         }
-        Set<Integer> mutualFriendsId = new HashSet<>(firstUser.getFriends());
+        Set<Long> mutualFriendsId = new HashSet<>(firstUser.getFriends());
         mutualFriendsId.retainAll(secondUser.getFriends());
         return storage.findAll().stream()
                 .filter(x -> mutualFriendsId.contains(x.getId()))

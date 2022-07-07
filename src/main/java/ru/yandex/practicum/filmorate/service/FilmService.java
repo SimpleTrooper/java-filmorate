@@ -31,7 +31,7 @@ public class FilmService extends DataService<FilmStorage, Film> {
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
-    public void addLike(Integer filmId, Integer userId) {
+    public void addLike(Long filmId, Long userId) {
         Film film = storage.findById(filmId);
         if (film == null) {
             throw new NotFoundException(String.format("Попытка поставить лайк фильму с id=%d пользователем с id=%d. " +
@@ -50,7 +50,7 @@ public class FilmService extends DataService<FilmStorage, Film> {
      * @param filmId - ID фильма
      * @param userId - ID пользователя
      */
-    public void removeLike(Integer filmId, Integer userId) {
+    public void removeLike(Long filmId, Long userId) {
         Film film = storage.findById(filmId);
         if (film == null) {
             throw new NotFoundException(String.format("Попытка удалить лайк фильму с id=%d пользователя с id=%d. " +

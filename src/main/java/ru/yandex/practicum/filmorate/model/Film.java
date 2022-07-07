@@ -21,13 +21,13 @@ public class Film extends DataEntity {
     private LocalDate releaseDate;//Ручная валидация даты релиза
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration; //продолжительность в минутах
-    private final Set<Integer> userLikes = new HashSet<>();//id пользователей, поставивших лайк
+    private final Set<Long> userLikes = new HashSet<>();//id пользователей, поставивших лайк
 
-    public void addLike(Integer userId) {
+    public void addLike(Long userId) {
         userLikes.add(userId);
     }
 
-    public void removeLike(Integer userId) {
+    public void removeLike(Long userId) {
         userLikes.remove(userId);
     }
 

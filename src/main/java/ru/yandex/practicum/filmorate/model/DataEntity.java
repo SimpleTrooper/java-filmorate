@@ -7,5 +7,5 @@ import lombok.Data;
  */
 @Data
 public abstract class DataEntity {
-    private Integer id; //id в теле запроса может отсутствовать (создается новая запись) - не пишем валидацию
+    private Long id; //id в теле запроса может отсутствовать (создается новая запись) - не пишем валидацию
 }

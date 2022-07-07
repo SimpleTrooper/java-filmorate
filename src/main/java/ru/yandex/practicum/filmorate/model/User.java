@@ -24,13 +24,13 @@ public class User extends DataEntity {
     private String name; //Ручная валидации при пустом имени (подстановка login)
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private final Set<Integer> friends = new HashSet<>();//id друзей
+    private final Set<Long> friends = new HashSet<>();//id друзей
 
-    public void addFriend(Integer userId) {
+    public void addFriend(Long userId) {
         friends.add(userId);
     }
 
-    public void removeFriend(Integer userId) {
+    public void removeFriend(Long userId) {
         friends.remove(userId);
     }
 }

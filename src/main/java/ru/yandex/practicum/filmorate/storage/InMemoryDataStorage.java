@@ -14,11 +14,11 @@ import java.util.Map;
  */
 public abstract class InMemoryDataStorage<T extends DataEntity> implements Storage<T> {
     private final IdGen idGen = new IdGen();
-    private final Map<Integer, T> data = new LinkedHashMap<>();
+    private final Map<Long, T> data = new LinkedHashMap<>();
 
     @Override
     public T add(T dataEntity) {
-        int nextId = idGen.nextId();
+        long nextId = idGen.nextId();
         dataEntity.setId(nextId);
         data.put(nextId, dataEntity);
         return dataEntity;
@@ -26,7 +26,7 @@ public abstract class InMemoryDataStorage<T extends DataEntity> implements Stora
 
     @Override
     public T update(T dataEntity) {
-        int id = dataEntity.getId();
+        long id = dataEntity.getId();
         if (!data.containsKey(id)) {
             throw new NotFoundException("Запись с id = " + id + " не найдена");
         }
@@ -40,7 +40,7 @@ public abstract class InMemoryDataStorage<T extends DataEntity> implements Stora
     }
 
     @Override
-    public T findById(Integer dataEntityId) {
+    public T findById(Long dataEntityId) {
         if (!data.containsKey(dataEntityId)) {
             throw new NotFoundException("Запись с id = " + dataEntityId + " не найдена");
         }

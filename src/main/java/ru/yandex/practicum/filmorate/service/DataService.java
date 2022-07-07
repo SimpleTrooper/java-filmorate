@@ -52,7 +52,7 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
      * Получение всех записи из хранилища по ID
      * @return нужная запись из хранилища
      */
-    public V getById(Integer id) {
+    public V getById(Long id) {
         V data = storage.findById(id);
         if (data == null) {
             throw new NotFoundException(String.format("Запись с id=%d не найдена", id));

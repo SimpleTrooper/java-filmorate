@@ -32,5 +32,5 @@ public interface Storage<T extends DataEntity> {
      * Вернуть запись по ID
      * @return искомая запись
      */
-     T findById(Integer id);
+     T findById(Long id);
 }
