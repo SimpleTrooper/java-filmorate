@@ -1,9 +1,9 @@
 # java-filmorate
 
-![ER диаграмма для Filmorate](/Filmorate_ER.png) 
+![ER диаграмма для Filmorate](/ER_Filmorate.png) 
 
 Таблицы:  
-**film** - таблица, хранящая фильмы  
+**films** - таблица, хранящая фильмы  
 
   - film_id        - идентификатор фильма, первичный ключ  
   - name           - название  
@@ -12,12 +12,12 @@
   - duration       - продолжительность в минутах  
   - mpa_rating_id  - внешний ключ, ссылка на таблицу mpa_rating, рейтинг фильма  
  
- **mpa_rating** - таблица, хранящая рейтинги mpa для фильмов  
+ **mpa_ratings** - таблица, хранящая рейтинги mpa для фильмов  
  
   - mpa_rating_id - идентификатор, первичный ключ  
   - name          - наименование рейтинга  
   
-  **genre** - таблица, хранящая жанры фильмов  
+  **genres** - таблица, хранящая жанры фильмов  
   
    - genre_id - идентификатор, первичный ключ  
    - name     - название  
@@ -28,7 +28,7 @@
    - film_id       - внешний ключ, ссылка на таблицу фильмов  
    - genre_id      - внешний ключ, ссылка на таблицу жанров  
    
-   **user** - таблица, хранящая пользователей  
+   **users** - таблица, хранящая пользователей  
    
    - user_id  - идентификатор, первичный ключ  
    - email    - электронная почта  
@@ -37,7 +37,7 @@
    - birthday - дата рождения  
     
     
-   **film_user_like** - таблица, хранящая лайки пользователей фильмам  
+   **likes** - таблица, хранящая лайки пользователей фильмам  
    
    - film_user_like_id - идентификатор, первичный ключ  
    - film_id           - внешний ключ, ссылка на таблицу фильмов  
@@ -55,15 +55,15 @@
    1) Вывести все фильмы с рейтингом PG  
   
               SELECT *   
-              FROM film AS f  
-              INNER JOIN mpa_rating AS mpa_r ON mpa_r.mpa_rating_id=f.mpa_rating_id   
+              FROM films AS f  
+              INNER JOIN mpa_ratings AS mpa_r ON mpa_r.mpa_rating_id=f.mpa_rating_id   
               WHERE mpa_r.name='PG'    
           
    2) Вывести топ-10 фильмов по лайкам:
    
            SELECT *
-           FROM film as f
-           LEFT JOIN film_user_like as ful ON f.film_id=ful.film_id
+           FROM films as f
+           LEFT JOIN likes as ful ON f.film_id=ful.film_id
            GROUP BY f.film_id
            ORDER BY COUNT(f.film_id) DESC
            LIMIT 10;
