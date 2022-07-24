@@ -1,6 +1,6 @@
 # java-filmorate
 
-![ER диаграмма для Filmorate](/ER_Filmorate.png) 
+![ER диаграмма для Filmorate](/Filmorate_ER.png) 
 
 Таблицы:  
 **films** - таблица, хранящая фильмы  
