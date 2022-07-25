@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inmemimpl;
 
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.DataEntity;
+import ru.yandex.practicum.filmorate.storage.Storage;
 import ru.yandex.practicum.filmorate.util.IdGen;
 
 import java.util.ArrayList;
