@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.links.Friendship;
+import ru.yandex.practicum.filmorate.storage.links.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.HashSet;
@@ -18,9 +21,13 @@ import java.util.stream.Collectors;
 @Service
 public class UserService extends DataService<UserStorage, User> {
 
+    private final FriendshipStorage friendshipStorage;
+
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage) {
         super(userStorage);
+        this.friendshipStorage = friendshipStorage;
     }
 
     /**
@@ -30,18 +37,15 @@ public class UserService extends DataService<UserStorage, User> {
      * @param friendId - ID друга
      */
     public void addFriend(Long userId, Long friendId) {
-        User user = storage.findById(userId);
-        if (user == null) {
+        if (!storage.contains(userId)) {
             throw new NotFoundException(String.format("Попытка добавить пользователю с id=%d, друга с id=%d. " +
                     "Пользователь с id=%d не найден", userId, friendId, userId));
         }
-        User friend = storage.findById(friendId);
-        if (friend == null) {
+        if (!storage.contains(friendId)) {
             throw new NotFoundException(String.format("Попытка добавить пользователю с id=%d, друга с id=%d. " +
                     "Пользователь с id=%d не найден", userId, friendId, friendId));
         }
-        user.addFriend(friendId);
-        friend.addFriend(userId);
+        friendshipStorage.add(new Friendship(userId, friendId));
     }
 
     /**
@@ -51,18 +55,15 @@ public class UserService extends DataService<UserStorage, User> {
      * @param friendId - ID друга
      */
     public void removeFriend(Long userId, Long friendId) {
-        User user = storage.findById(userId);
-        if (user == null) {
+        if (!storage.contains(userId)) {
             throw new NotFoundException(String.format("Попытка удалить у пользователя с id=%d, друга с id=%d. " +
                     "Пользователь с id=%d не найден", userId, friendId, userId));
         }
-        User friend = storage.findById(friendId);
-        if (friend == null) {
+        if (!storage.contains(friendId)) {
             throw new NotFoundException(String.format("Попытка удалить у пользователя с id=%d, друга с id=%d. " +
                     "Пользователь с id=%d не найден", userId, friendId, friendId));
         }
-        user.removeFriend(friendId);
-        friend.removeFriend(userId);
+        friendshipStorage.remove(new Friendship(userId, friendId));
     }
 
     /**
@@ -90,16 +91,16 @@ public class UserService extends DataService<UserStorage, User> {
      * @return список общих друзей пользователей
      */
     public List<User> findMutualFriends(Long firstUserId, Long secondUserId) {
-        User firstUser = storage.findById(firstUserId);
-        if (firstUser == null) {
+        if (!storage.contains(firstUserId)) {
             throw new NotFoundException(String.format("Попытка получить список общих друзей пользователей с " +
                     "id=%d, %d. Пользователь с id=%d не найден", firstUserId, secondUserId, firstUserId));
         }
-        User secondUser = storage.findById(secondUserId);
-        if (secondUser == null) {
+        if (!storage.contains(secondUserId)) {
             throw new NotFoundException(String.format("Попытка получить список общих друзей пользователей с " +
                     "id=%d, %d. Пользователь с id=%d не найден", firstUserId, secondUserId, secondUserId));
         }
+        User firstUser = storage.findById(firstUserId);
+        User secondUser = storage.findById(secondUserId);
         Set<Long> mutualFriendsId = new HashSet<>(firstUser.getFriends());
         mutualFriendsId.retainAll(secondUser.getFriends());
         return storage.findAll().stream()

@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
  * Обработчик ошибок
  */
 @Slf4j
-@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class,
+        GenreController.class, MpaRatingController.class})
 public class ErrorHandler {
     /**
      * Обработчик исключения при отсутствии ресурса

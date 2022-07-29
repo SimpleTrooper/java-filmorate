@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.DataEntity;
 import ru.yandex.practicum.filmorate.storage.Storage;
@@ -36,10 +37,10 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
      * @return новая запись
      */
     public V update(V dataEntity) {
-        V updated = storage.update(dataEntity);
-        if (updated == null) {
+        if (!storage.contains(dataEntity.getId())) {
             throw new NotFoundException(String.format("Запись с id=%d не найдена", dataEntity.getId()));
         }
+        V updated = storage.update(dataEntity);
         return updated;
     }
 
@@ -58,11 +59,15 @@ public abstract class DataService<T extends Storage<V>, V extends DataEntity> {
      * @return нужная запись из хранилища
      */
     public V getById(Long id) {
-        V data = storage.findById(id);
+        V data;
+        try {
+            data = storage.findById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(String.format("Запись с id=%d не найдена", id), ex);
+        }
         if (data == null) {
             throw new NotFoundException(String.format("Запись с id=%d не найдена", id));
         }
         return data;
     }
-
 }

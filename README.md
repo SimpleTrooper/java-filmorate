@@ -74,7 +74,7 @@
           SELECT f.friend_id AS mutual_friend  
           FROM friendship f  
           WHERE f.user_id=1 AND f.status=true  
-	            AND f.friend_id IN (SELECT f.friend_id  
-					          FROM friendship as f  
-                                    WHERE f.user_id=2 AND f.status=true);
+	            AND f.friend_id IN (SELECT fr2.friend_id  
+					          FROM friendship as fr2  
+                                    WHERE fr2.user_id=2 AND fr2.status=true);
      
