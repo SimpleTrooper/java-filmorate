@@ -1,22 +1,23 @@
 package ru.yandex.practicum.filmorate.storage.dbimpl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.links.Friendship;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.links.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Реализация хранилища пользователей в БД
+ */
 @Component("userDbStorage")
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -30,42 +31,53 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User add(User user) {
+        if (user == null) {
+            return null;
+        }
         checkFriendsExistence(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
         Long userId = simpleJdbcInsert.executeAndReturnKey(user.toMap()).longValue();
         user.getFriends()
-                .forEach(friendId -> {
-                    friendshipStorage.add(new Friendship(userId, friendId, true));
-                });
+                .forEach(friendId -> friendshipStorage.add(new Friendship(userId, friendId, true)));
         user.setId(userId);
         return user;
     }
 
     private void checkFriendsExistence(User user) {
         user.getFriends()
-                .forEach(friendId -> {
-                    try {
-                        findById(friendId);
-                    } catch (DataAccessException ex) {
-                        throw new NotFoundException("Не найден пользователь с id = " + friendId);
-                    }
-                });
+                .forEach(this::checkUserExistence);
+    }
+
+    private void checkUserExistence(Long userId) {
+        if (!contains(userId)) {
+            throw new NotFoundException("Не найден пользователь с id = " +
+                    userId);
+        }
+    }
+
+    @Override
+    public boolean contains(Long userId) {
+        try {
+            findById(userId);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public User update(User user) {
-        if (findById(user.getId()) == null) {
-            throw new NotFoundException("Не найден пользователь с id = " + user.getId());
+        if (user == null) {
+            return null;
         }
+        checkUserExistence(user.getId());
         checkFriendsExistence(user);
         String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ?";
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
         user.getFriends()
-                .forEach(friendId -> {
-                    friendshipStorage.add(new Friendship(user.getId(), friendId, true));
-                });
+                .forEach(friendId -> friendshipStorage.add(new Friendship(user.getId(), friendId, true)));
         return user;
     }
 

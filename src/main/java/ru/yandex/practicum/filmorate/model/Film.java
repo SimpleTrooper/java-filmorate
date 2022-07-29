@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.sql.Date;
@@ -16,6 +19,7 @@ import java.util.*;
  */
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Film extends DataEntity {
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
@@ -24,18 +28,23 @@ public class Film extends DataEntity {
     private LocalDate releaseDate;//Ручная валидация даты релиза
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration; //продолжительность в минутах
-    private final Set<Genre> genres = new HashSet<>();//жанры фильма
-    private MpaRating mpaRating;//MPA-рейтинг фильма
+
+    @JsonDeserialize(as = LinkedHashSet.class)
+    private final Set<Genre> genres = new LinkedHashSet<>();//жанры фильма
+    //важен порядок id жанров для прохождения одного из тестов
+
+    @NotNull
+    private MpaRating mpa;//MPA-рейтинг фильма
     private final Set<Long> userLikes = new HashSet<>();//id пользователей, поставивших лайк
 
     @Builder
-    public Film (Long id, String name, String description, LocalDate releaseDate, int duration,  MpaRating mpaRating) {
+    public Film (Long id, String name, String description, LocalDate releaseDate, int duration,  MpaRating mpa) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.mpaRating = mpaRating;
+        this.mpa = mpa;
     }
 
     public void addLike(Long userId) {
@@ -73,8 +82,8 @@ public class Film extends DataEntity {
         map.put("release_date", Date.valueOf(releaseDate));
         map.put("duration", duration);
         Long mpaRatingId = null;
-        if (mpaRating != null) {
-            mpaRatingId = mpaRating.getId();
+        if (mpa != null) {
+            mpaRatingId = mpa.getId();
         }
         map.put("mpa_rating_id", mpaRatingId);
         return map;

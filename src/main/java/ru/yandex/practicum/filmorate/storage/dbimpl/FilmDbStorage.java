@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dbimpl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -12,12 +12,17 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.links.FilmGenre;
 import ru.yandex.practicum.filmorate.model.links.Like;
 import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.links.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.links.LikesStorage;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Реализация хранилища фильмов в БД
+ */
 @Component("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -42,6 +47,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film add(Film film) {
+        if (film == null) {
+            return null;
+        }
         checkMpaRatingExistence(film);
         checkGenresExistence(film);
         checkUsersExistence(film);
@@ -60,49 +68,73 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        Long filmId = film.getId();
-        Film toUpdate = findById(filmId);
-        if (toUpdate == null) {
-            throw new NotFoundException("Не найден фильм с id = " + filmId);
+        if (film == null) {
+            return null;
         }
-        checkMpaRatingExistence(film);
-        checkGenresExistence(film);
-        checkUsersExistence(film);
+        Long filmId = film.getId();
+        checkFilm(film);
         filmGenreStorage.removeGenresByFilmId(filmId);
         likesStorage.removeLikesByFilmId(filmId);
 
         String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?";
+        Long mpaRatingId = film.getMpa().getId();
+        film.getGenres()
+                .forEach(genre -> filmGenreStorage.add(new FilmGenre(filmId, genre.getId())));
+        film.getUserLikes()
+                .forEach(userId -> likesStorage.add(new Like(filmId, userId)));
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getMpaRating().getId());
+                film.getDuration(), mpaRatingId);
         return film;
     }
 
+    private void checkFilm(Film film) {
+        checkFilmExistence(film.getId());
+        checkMpaRatingExistence(film);
+        checkGenresExistence(film);
+        checkUsersExistence(film);
+    }
+
+    private void checkFilmExistence(Long filmId) {
+        if (!contains(filmId)) {
+            throw new NotFoundException("Не найден фильм с id = " + filmId);
+        }
+    }
+
     private void checkMpaRatingExistence(Film film) {
-        if (film.getMpaRating() != null) {
-            if (mpaRatingStorage.findById(film.getMpaRating().getId()) == null) {
-                throw new NotFoundException("Не найден рейтинг MPA с id = " + film.getMpaRating().getId());
-            }
+        Long mpaId = null;
+        if (film.getMpa() != null) {
+            mpaId = film.getMpa().getId();
+        }
+        if (!mpaRatingStorage.contains(mpaId)) {
+            throw new NotFoundException("Не найден рейтинг MPA с id = " + mpaId);
         }
     }
 
     private void checkUsersExistence(Film film) {
-        film.getUserLikes()
-                .forEach(userId -> {
-                    try {
-                        userStorage.findById(userId);
-                    } catch (DataAccessException ex) {
-                        throw new NotFoundException("Не найден пользователь с id = " + userId);
-                    }
-                });
+        for (Long userId : film.getUserLikes()) {
+            if (!userStorage.contains(userId)) {
+                throw new NotFoundException("Не найден пользователь с id = " + userId);
+            }
+        }
     }
 
     private void checkGenresExistence(Film film) {
         film.getGenres()
                 .forEach(genre -> {
-                    if (genreStorage.findById(genre.getId()) == null) {
+                    if (!genreStorage.contains(genre.getId())) {
                         throw new NotFoundException("Не найден жанр с id = " + genre.getId());
                     }
                 });
+    }
+
+    @Override
+    public boolean contains(Long filmId) {
+        try {
+            findById(filmId);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -123,17 +155,20 @@ public class FilmDbStorage implements FilmStorage {
         String name = resultSet.getString("name");
         String description = resultSet.getString("description");
         Date releaseDate = resultSet.getDate("release_date");
-        Integer duration = resultSet.getInt("duration");
+        int duration = resultSet.getInt("duration");
         List<Long> userLikes = likesStorage.getUsersByFilmId(filmId);
         Long mpaRatingId = resultSet.getLong("mpa_rating_id");
-        MpaRating mpaRating = mpaRatingStorage.findById(mpaRatingId);
+        MpaRating mpaRating = null;
+        if (mpaRatingStorage.contains(mpaRatingId)) {
+            mpaRating = mpaRatingStorage.findById(mpaRatingId);
+        }
         List<Genre> genres = filmGenreStorage.getGenresByFilmId(filmId);
         Film film = Film.builder()
                 .id(filmId)
                 .name(name)
                 .description(description)
                 .duration(duration)
-                .mpaRating(mpaRating)
+                .mpa(mpaRating)
                 .releaseDate(releaseDate.toLocalDate())
                 .build();
         film.addAllLikes(userLikes);

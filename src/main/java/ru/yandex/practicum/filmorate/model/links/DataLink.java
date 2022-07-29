@@ -5,6 +5,9 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Абстрактная сущность для связи двух таблиц
+ */
 @Data
 @AllArgsConstructor
 public abstract class DataLink {

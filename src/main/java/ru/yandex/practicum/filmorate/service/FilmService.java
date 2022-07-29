@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.links.Like;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.links.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Comparator;
@@ -20,12 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService extends DataService<FilmStorage, Film> {
     private final UserStorage userStorage;
+    private final LikesStorage likesStorage;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage")  UserStorage userStorage) {
+                       @Qualifier("userDbStorage")  UserStorage userStorage,
+                       @Qualifier("likesDbStorage") LikesStorage likesStorage) {
         super(filmStorage);
         this.userStorage = userStorage;
+        this.likesStorage = likesStorage;
     }
 
     /**
@@ -35,17 +39,15 @@ public class FilmService extends DataService<FilmStorage, Film> {
      * @param userId - ID пользователя
      */
     public void addLike(Long filmId, Long userId) {
-        Film film = storage.findById(filmId);
-        if (film == null) {
+        if (!storage.contains(filmId)) {
             throw new NotFoundException(String.format("Попытка поставить лайк фильму с id=%d пользователем с id=%d. " +
                     "Фильм с id=%d не найден", filmId, userId, filmId));
         }
-        User user = userStorage.findById(userId);
-        if (user == null) {
+        if (!userStorage.contains(userId)) {
             throw new NotFoundException(String.format("Попытка поставить лайк фильму с id=%d пользователем с id=%d. " +
                     "Пользователь с id=%d не найден", filmId, userId, userId));
         }
-        film.addLike(userId);
+        likesStorage.add(new Like(filmId, userId));
     }
 
     /**
@@ -55,17 +57,15 @@ public class FilmService extends DataService<FilmStorage, Film> {
      * @param userId - ID пользователя
      */
     public void removeLike(Long filmId, Long userId) {
-        Film film = storage.findById(filmId);
-        if (film == null) {
+        if (!storage.contains(filmId)) {
             throw new NotFoundException(String.format("Попытка удалить лайк фильму с id=%d пользователя с id=%d. " +
                     "Фильм с id=%d не найден", filmId, userId, filmId));
         }
-        User user = userStorage.findById(userId);
-        if (user == null) {
+        if (!userStorage.contains(userId)) {
             throw new NotFoundException(String.format("Попытка удалить лайк фильму с id=%d пользователя с id=%d. " +
                     "Пользователь с id=%d не найден", filmId, userId, userId));
         }
-        film.removeLike(userId);
+        likesStorage.remove(new Like(filmId, userId));
     }
 
     /**

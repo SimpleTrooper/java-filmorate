@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.storage.dbimpl;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.links.Like;
-import ru.yandex.practicum.filmorate.storage.LikesStorage;
+import ru.yandex.practicum.filmorate.storage.links.LikesStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Реализация хранилища лайков в БД
+ */
 @Component("likesDbStorage")
 public class LikesDbStorage implements LikesStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -32,12 +34,15 @@ public class LikesDbStorage implements LikesStorage {
 
     @Override
     public Like getByKey(Long filmId, Long userId) {
-        String sql = "SELECT user_id FROM likes WHERE film_id = ? AND user_id = ?";
+        String sql = "SELECT film_id, user_id FROM likes WHERE film_id = ? AND user_id = ?";
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeLike(rs), filmId, userId);
     }
 
     @Override
     public Like add(Like like) {
+        if (like == null) {
+            return null;
+        }
         String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, like.getFilmId(), like.getUserId());
         return like;
@@ -45,6 +50,9 @@ public class LikesDbStorage implements LikesStorage {
 
     @Override
     public boolean remove(Like like) {
+        if (like == null) {
+            return false;
+        }
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         return jdbcTemplate.update(sql, like.getFilmId(), like.getUserId()) > 0;
     }

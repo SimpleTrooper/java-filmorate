@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.model.links;
 
+/**
+ * Класс связи фильм-жанр
+ */
 public class FilmGenre extends DataLink {
     public FilmGenre(Long filmId, Long genreId) {
         super(filmId, genreId);
@@ -14,10 +17,10 @@ public class FilmGenre extends DataLink {
     }
 
     public Long getGenreId() {
-        return super.getFirstId();
+        return super.getSecondId();
     }
 
-    public void setGenreId(Long filmId) {
-        super.setFirstId(filmId);
+    public void setGenreId(Long genreId) {
+        super.setSecondId(genreId);
     }
 }

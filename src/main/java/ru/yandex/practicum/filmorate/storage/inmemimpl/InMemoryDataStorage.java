@@ -47,4 +47,9 @@ public abstract class InMemoryDataStorage<T extends DataEntity> implements Stora
         }
         return data.get(dataEntityId);
     }
+
+    @Override
+    public boolean contains(Long id) {
+        return findById(id) != null;
+    }
 }

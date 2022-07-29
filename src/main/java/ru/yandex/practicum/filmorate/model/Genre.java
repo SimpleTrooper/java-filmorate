@@ -1,12 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Класс жанра фильмов
+ */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Genre extends DataEntity {
     @NotBlank
     private String name;

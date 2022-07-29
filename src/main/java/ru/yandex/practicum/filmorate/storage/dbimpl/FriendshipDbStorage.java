@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate.storage.dbimpl;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.links.Friendship;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.links.FriendshipStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Реализация хранилища дружбы пользователей
+ */
 @Component("friendshipDbStorage")
 public class FriendshipDbStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -31,36 +35,56 @@ public class FriendshipDbStorage implements FriendshipStorage {
 
     @Override
     public Friendship getByKey(Long userId, Long friendId) {
-        String sql = "SELECT friend_id FROM friendship WHERE user_id = ? AND friend_id = ?";
+        String sql = "SELECT user_id, friend_id, status FROM friendship WHERE user_id = ? AND friend_id = ?";
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeFriendship(rs), userId, friendId);
     }
 
     @Override
     public Friendship add(Friendship friendship) {
+        if (friendship == null) {
+            return null;
+        }
         String sql = "INSERT INTO friendship (user_id, friend_id, status) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, friendship.getUserId(), friendship.getFriendId(), friendship.isStatus());
+        try {
+            getByKey(friendship.getFriendId(), friendship.getUserId());
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            jdbcTemplate.update(sql, friendship.getUserId(), friendship.getFriendId(), false);
+            return friendship;
+        }
+        jdbcTemplate.update(sql, friendship.getUserId(), friendship.getFriendId(), true);
+        setFriendshipStatusConfirmed(new Friendship(friendship.getFriendId(), friendship.getUserId()));
         return friendship;
     }
 
     @Override
     public boolean remove(Friendship friendship) {
+        if (friendship == null) {
+            return false;
+        }
         String sql = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
-        return jdbcTemplate.update(sql, friendship.getUserId(), friendship.getFriendId()) > 0;
+        if (jdbcTemplate.update(sql, friendship.getUserId(), friendship.getFriendId()) > 0) {
+            setFriendshipStatusNotConfirmed(new Friendship(friendship.getFriendId(), friendship.getUserId()));
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void setFriendshipStatusConfirmed(Friendship friendship) {
-        setFriendshipStatus(friendship, true);
+    public boolean setFriendshipStatusConfirmed(Friendship friendship) {
+        return setFriendshipStatus(friendship, true);
     }
 
     @Override
-    public void setFriendshipStatusNotConfirmed(Friendship friendship) {
-        setFriendshipStatus(friendship, false);
+    public boolean setFriendshipStatusNotConfirmed(Friendship friendship) {
+        return setFriendshipStatus(friendship, false);
     }
 
-    private void setFriendshipStatus(Friendship friendship, boolean status) {
+    private boolean setFriendshipStatus(Friendship friendship, boolean status) {
+        if (friendship == null) {
+            return false;
+        }
         String sql = "UPDATE friendship SET status = ? WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sql, status, friendship.getUserId(), friendship.getFriendId());
+        return jdbcTemplate.update(sql, status, friendship.getUserId(), friendship.getFriendId()) > 0;
     }
 
     private Friendship makeFriendship(ResultSet resultSet) throws SQLException {

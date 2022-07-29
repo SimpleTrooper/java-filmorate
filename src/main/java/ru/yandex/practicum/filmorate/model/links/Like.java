@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.model.links;
 
+/**
+ * Класс, описывающий лайки к фильму (связь фильм-пользователь)
+ */
 public class Like extends DataLink {
     public Like(Long filmId, Long userId) {
         super(filmId, userId);

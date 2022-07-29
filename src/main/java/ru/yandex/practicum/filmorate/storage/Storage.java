@@ -37,4 +37,11 @@ public interface Storage<T extends DataEntity> {
      * @return искомая запись
      */
     T findById(Long id);
+
+    /**
+     * Проверить - существует ли запись в хранилище
+     * @param id записи
+     * @return true, если существует, false - иначе
+     */
+    boolean contains(Long id);
 }

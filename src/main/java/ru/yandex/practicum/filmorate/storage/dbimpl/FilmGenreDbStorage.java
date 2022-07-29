@@ -5,13 +5,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.links.FilmGenre;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.links.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Реализация хранилища связи жанров и фильмов в БД
+ */
 @Component("filmGenreDbStorage")
 public class FilmGenreDbStorage implements FilmGenreStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -42,6 +45,9 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
 
     @Override
     public FilmGenre add(FilmGenre filmGenre) {
+        if (filmGenre == null) {
+            return null;
+        }
         String sql = "INSERT INTO film_genre(film_id, genre_id) VALUES(?, ?)";
         jdbcTemplate.update(sql, filmGenre.getFilmId(), filmGenre.getGenreId());
         return filmGenre;
@@ -49,6 +55,9 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
 
     @Override
     public boolean remove(FilmGenre filmGenre) {
+        if (filmGenre == null) {
+            return false;
+        }
         String sql = "DELETE FROM film_genre WHERE film_id = ? AND genre_id = ?";
         return jdbcTemplate.update(sql, filmGenre.getFilmId(), filmGenre.getGenreId()) > 0;
     }
